@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+  <style>
+    .pointcalculate,
+    .pointcontent {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
+
+    .pointcalculate {
+      margin: 10px 0;
+    }
+
+    .pointcontent {
+      flex: 1
+    }
+
+    .result {
+      font-size: 20px;
+    }
+
+    .valuestyle {
+      font-weight: bold;
+      color: #409EFF;
+    }
+
+    .resultitem {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <el-row :gutter="20">
+      <el-col :span="10">
+        <div class="grid-content bg-purple">
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <el-tag>工资计算</el-tag>
+              <el-button style="float: right; padding: 3px 0" type="text" @click="pricereset">重置</el-button>
+            </div>
+            <div v-for="(item,index) in 8" :key="index" class="pointcalculate">
+              <div style="width:50px;"> {{ruleForm.standard[index].name}}</div>
+              <div class="pointcontent">
+                <el-input-number v-model.trim="ruleForm.point[index]" :precision="1" :step="0.5">
+                </el-input-number>+
+                <el-input-number v-model.trim="ruleForm.weekdaypoint[index]" :precision="1" :step="0.5">
+                </el-input-number>
+                双
+              </div>
+            </div>
+            <el-radio-group v-model="ifcoefficient" style="width:100%;margin:20px 0">
+              <el-radio :label="1" border>有系数</el-radio>
+              <el-radio :label="0" border>无系数</el-radio>
+            </el-radio-group>
+            <el-button style="width: 100%;" @click="calculatesalary" type="primary" plain>计算</el-button>
+          </el-card>
+
+        </div>
+      </el-col>
+      <el-col :span="8">
+        <div class="grid-content bg-purple-light">
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <el-tag>计算结果</el-tag>
+            </div>
+            <div class="result" v-if="ifcalculate">
+              <div class="resultitem">系数分值为：<span class="valuestyle">{{coefficientpoint}}</span></div>
+              <div class="resultitem">系数为：<span class="valuestyle">{{coefficient}}</span></div>
+              <div class="resultitem">重点稿分值为：<span class="valuestyle">{{keypoint}}</span></div>
+              <div class="resultitem">非重点稿分值为：<span class="valuestyle">{{normalpoint}}</span></div>
+              <div class="resultitem">总分值为：<span class="valuestyle">{{totalpoint}}</span></div>
+              <el-divider></el-divider>
+              <div class="resultitem">月度绩效奖大约为：<span class="valuestyle">900</span></div>
+              <div class="resultitem">目标奖约为：<span class="valuestyle">200 ~ 500</span></div>
+              <el-divider></el-divider>
+              <div class="resultitem">本月奖金约为：<div class="valuestyle" style="font-size: 30px">{{salary+200}} ~
+                  {{salary+500}}</div>
+              </div>
+            </div>
+          </el-card>
+        </div>
+      </el-col>
+      <el-col :span="6">
+        <div class="grid-content bg-purple-light">
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <el-tag>系数标准</el-tag>
+            </div>
+            <div>
+              <el-table :data="ruleForm.standard" style="width: 100%" border stripe>
+                <el-table-column prop="name" label="等级">
+                </el-table-column>
+                <el-table-column prop="point" label="分值">
+                </el-table-column>
+              </el-table>
+              <el-divider></el-divider>
+              <el-table :data="ruleForm.pointstandard" style="width: 100%" border stripe>
+                <el-table-column label="系数分值" prop="coefficientpoint">
+                </el-table-column>
+                <el-table-column label="系数" prop="coefficient">
+                </el-table-column>
+              </el-table>
+            </div>
+          </el-card>
+        </div>
+      </el-col>
+    </el-row>
+  </div>
+</body>
+
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+  new Vue({
+    el: '#app',
+    data: function () {
+      return {
+        ifcoefficient: 1,
+        ifcalculate: false,
+        num: 0,
+        coefficient: 0,
+        coefficientpoint: 0,
+        keypoint: 0,
+        normalpoint: 0,
+        totalpoint: 0,
+        salary: 0,
+        ruleForm: {
+          standard: [{
+            name: 'A',
+            point: 70
+          },
+          {
+            name: 'B+',
+            point: 55
+          },
+          {
+            name: 'B',
+            point: 45
+          }, {
+            name: 'C+',
+            point: 30
+          }, {
+            name: 'C',
+            point: 20
+          }, {
+            name: 'D+',
+            point: 10
+          }, {
+            name: 'D',
+            point: 6
+          }, {
+            name: 'E',
+            point: 2
+          }],
+          pointstandard: [{
+            coefficientpoint: 120,
+            coefficient: 1.1
+          }, {
+            coefficientpoint: 150,
+            coefficient: 1.3
+          }, {
+            coefficientpoint: 200,
+            coefficient: 1.4
+          }, {
+            coefficientpoint: 250,
+            coefficient: 1.5
+          }, {
+            coefficientpoint: 300,
+            coefficient: 1.7
+          }],
+          point: [0, 0, 1.5, 3, 10, 9, 15, 35],
+          weekdaypoint: [0, 0, 0, 0, 0, 0, 0, 6],
+        }
+      }
+    },
+    components: {},
+    created () {
+
+    },
+    methods: {
+      pricereset () {
+        this.ruleForm.point = [0, 0, 0, 0, 0, 0, 0, 0]
+        this.ruleForm.weekdaypoint = [0, 0, 0, 0, 0, 0, 0, 0]
+        this.ifcalculate = false
+      },
+      calculatesalary () {
+        let coefficient = 0
+        let coefficientpoint = 0
+        let point = 0
+        let keypoint = 0
+        let normalpoint = 0
+        if (this.ifcoefficient == 1) {
+          for (let i = 0; i < 8; i++) {
+            coefficientpoint += this.ruleForm.point[i] * this.ruleForm.standard[i].point
+          }
+          if ((coefficientpoint > 120 || coefficient == 120) && coefficientpoint < 150) {
+            coefficient = 1.1
+          } else if ((coefficientpoint > 150 || coefficient == 150) && coefficientpoint < 200) {
+            coefficient = 1.3
+          } else if ((coefficientpoint > 200 || coefficient == 200) && coefficientpoint < 250) {
+            coefficient = 1.4
+          } else if ((coefficientpoint > 250 || coefficient == 250) && coefficientpoint < 300) {
+            coefficient = 1.5
+          } else if (coefficientpoint > 300 || coefficientpoint == 300) {
+            coefficient = 1.7
+          } else {
+            coefficient = 1
+          }
+          this.coefficient = coefficient
+          this.coefficientpoint = coefficientpoint
+        }
+        else {
+          this.coefficient = 1
+          this.coefficientpoint = 0
+        }
+
+        let weekdaypoint = 0
+        for (let i = 0; i < 5; i++) {
+          keypoint += this.ruleForm.point[i] * this.ruleForm.standard[i].point
+          weekdaypoint += this.ruleForm.weekdaypoint[i] * this.ruleForm.standard[i].point
+        }
+        keypoint = keypoint * this.coefficient + weekdaypoint
+        for (let i = 5; i < 8; i++) {
+          normalpoint += (this.ruleForm.point[i] + this.ruleForm.weekdaypoint[i]) * this.ruleForm.standard[i].point
+        }
+        this.keypoint = keypoint
+        this.normalpoint = normalpoint
+        this.totalpoint = keypoint + normalpoint
+        this.salary = this.totalpoint * 10 + 900
+        this.ifcalculate = true
+      },
+    }
+  })
+</script>
+
+</html>
