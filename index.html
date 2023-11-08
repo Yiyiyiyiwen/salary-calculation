@@ -38,8 +38,11 @@
 
 <body>
   <div id="app">
+    <el-row>
+      <h2>工资计算系统 2.0</h2>
+    </el-row>
     <el-row :gutter="20">
-      <el-col :span="10">
+      <el-col :xs="24" :lg="12">
         <div class="grid-content bg-purple">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
@@ -53,7 +56,10 @@
                 </el-input-number>+
                 <el-input-number v-model.trim="ruleForm.weekdaypoint[index]" :precision="1" :step="0.5">
                 </el-input-number>
-                双
+                双 +
+                <el-input-number v-model.trim="ruleForm.planpoint[index]" :precision="1" :step="0.5">
+                </el-input-number>
+                策划
               </div>
             </div>
             <el-radio-group v-model="ifcoefficient" style="width:100%;margin:20px 0">
@@ -65,7 +71,7 @@
 
         </div>
       </el-col>
-      <el-col :span="8">
+      <el-col :xs="24" :lg="6">
         <div class="grid-content bg-purple-light">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
@@ -76,6 +82,7 @@
               <div class="resultitem">系数为：<span class="valuestyle">{{coefficient}}</span></div>
               <div class="resultitem">重点稿分值为：<span class="valuestyle">{{keypoint}}</span></div>
               <div class="resultitem">非重点稿分值为：<span class="valuestyle">{{normalpoint}}</span></div>
+              <div class="resultitem">策划分值为:<span class="valuestyle">{{planpoint}}</span></div>
               <div class="resultitem">总分值为：<span class="valuestyle">{{totalpoint}}</span></div>
               <el-divider></el-divider>
               <div class="resultitem">月度绩效奖大约为：<span class="valuestyle">900</span></div>
@@ -88,12 +95,16 @@
           </el-card>
         </div>
       </el-col>
-      <el-col :span="6">
+      <el-col :xs="24" :lg="6">
         <div class="grid-content bg-purple-light">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
               <el-tag>系数标准</el-tag>
             </div>
+            <el-radio-group v-model="coefficientstandard" style="width:100%;margin:20px 0" size="small">
+              <el-radio :label="1" border>视频组</el-radio>
+              <el-radio :label="0" border>美编组</el-radio>
+            </el-radio-group>
             <div>
               <el-table :data="ruleForm.standard" style="width: 100%" border stripe>
                 <el-table-column prop="name" label="等级">
@@ -123,12 +134,14 @@
     data: function () {
       return {
         ifcoefficient: 1,
+        coefficientstandard: 1,
         ifcalculate: false,
         num: 0,
         coefficient: 0,
         coefficientpoint: 0,
         keypoint: 0,
         normalpoint: 0,
+        planpoint: 0,
         totalpoint: 0,
         salary: 0,
         ruleForm: {
@@ -177,12 +190,74 @@
           }],
           point: [0, 0, 0, 0, 0, 0, 0, 0],
           weekdaypoint: [0, 0, 0, 0, 0, 0, 0, 0],
+          planpoint: [0, 0, 0, 0, 0, 0, 0, 0]
         }
       }
     },
     components: {},
     created () {
 
+    },
+    watch: {
+      coefficientstandard (newval, oldval) {
+        if (newval === 0) {
+          this.ruleForm.standard = [{
+            name: 'A',
+            point: 60
+          },
+          {
+            name: 'B+',
+            point: 55
+          },
+          {
+            name: 'B',
+            point: 35
+          }, {
+            name: 'C+',
+            point: 25
+          }, {
+            name: 'C',
+            point: 15
+          }, {
+            name: 'D+',
+            point: 9
+          }, {
+            name: 'D',
+            point: 5
+          }, {
+            name: 'E',
+            point: 2
+          }]
+        } else {
+          this.ruleForm.standard = [{
+            name: 'A',
+            point: 70
+          },
+          {
+            name: 'B+',
+            point: 55
+          },
+          {
+            name: 'B',
+            point: 45
+          }, {
+            name: 'C+',
+            point: 30
+          }, {
+            name: 'C',
+            point: 20
+          }, {
+            name: 'D+',
+            point: 10
+          }, {
+            name: 'D',
+            point: 6
+          }, {
+            name: 'E',
+            point: 2
+          }]
+        }
+      }
     },
     methods: {
       pricereset () {
@@ -222,6 +297,7 @@
         }
 
         let weekdaypoint = 0
+        let planpoint = 0
         for (let i = 0; i < 5; i++) {
           keypoint += this.ruleForm.point[i] * this.ruleForm.standard[i].point
           weekdaypoint += this.ruleForm.weekdaypoint[i] * this.ruleForm.standard[i].point
@@ -230,9 +306,13 @@
         for (let i = 5; i < 8; i++) {
           normalpoint += (this.ruleForm.point[i] + this.ruleForm.weekdaypoint[i]) * this.ruleForm.standard[i].point
         }
+        for (let i = 0; i < this.ruleForm.planpoint.length; i++) {
+          planpoint += this.ruleForm.planpoint[i] * this.ruleForm.standard[i].point
+        }
         this.keypoint = keypoint
         this.normalpoint = normalpoint
-        this.totalpoint = keypoint + normalpoint
+        this.planpoint = planpoint
+        this.totalpoint = keypoint + normalpoint + planpoint
         this.salary = this.totalpoint * 10 + 900
         this.ifcalculate = true
       },
