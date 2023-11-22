@@ -97,7 +97,7 @@
 <body>
   <div id="app">
     <el-row :class="isPhone?'navbarmobile':'navbar'">
-      <img src="/images/wxrblogo.png" style="margin-right:20px">
+      <img src="/salary-calculation/images/wxrblogo.png" style="margin-right:20px">
       <h2>🏦 工资计算系统 2.0</h2>
     </el-row>
     <el-row :gutter="20">
@@ -412,7 +412,7 @@
         setInterval(function () {
           var left = Math.random() * window.innerWidth;
           var height = Math.random() * window.innerHeight;
-          var src = '/images/money.png';
+          var src = '/salary-calculation/images/money.png';
           that.snowFlow(left, height, src);
         }, 100)
       },
