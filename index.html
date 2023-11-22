@@ -2,7 +2,8 @@
 <html>
 
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
   <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
   <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
   <style>
@@ -11,6 +12,16 @@
       display: flex;
       align-items: center;
       justify-content: space-around;
+    }
+
+    .pointcontentmobile {
+      display: block;
+      text-align: center;
+    }
+
+    .pointcontentmobile .el-input-number {
+      width: 80%;
+      margin: 5px 0;
     }
 
     .pointcalculate {
@@ -33,13 +44,31 @@
     .resultitem {
       margin: 10px 0;
     }
+
+    .el-input-number>.el-input::after {
+      content: var(--el-input-number-unit);
+      position: absolute;
+      right: 50px;
+      color: #8D8D8D;
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .navbarmobile {
+      text-align: center;
+    }
   </style>
 </head>
 
 <body>
   <div id="app">
-    <el-row>
-      <h2>工资计算系统 2.0</h2>
+    <el-row :class="isPhone?'navbarmobile':'navbar'">
+      <img src="http://szb.wxrb.com/layout/home/resource/image/wxrblogo.png" style="margin-right:20px">
+      <h2>🏦 工资计算系统 2.0</h2>
     </el-row>
     <el-row :gutter="20">
       <el-col :xs="24" :lg="12">
@@ -51,15 +80,16 @@
             </div>
             <div v-for="(item,index) in 8" :key="index" class="pointcalculate">
               <div style="width:50px;"> {{ruleForm.standard[index].name}}</div>
-              <div class="pointcontent">
+              <div :class="isPhone?'pointcontentmobile':'pointcontent'">
                 <el-input-number v-model.trim="ruleForm.point[index]" :precision="1" :step="0.5">
-                </el-input-number>+
-                <el-input-number v-model.trim="ruleForm.weekdaypoint[index]" :precision="1" :step="0.5">
                 </el-input-number>
-                双 +
-                <el-input-number v-model.trim="ruleForm.planpoint[index]" :precision="1" :step="0.5">
+                <el-input-number v-model.trim="ruleForm.weekdaypoint[index]" :precision="1" :step="0.5"
+                  style="--el-input-number-unit: '双'">
                 </el-input-number>
-                策划
+
+                <el-input-number v-model.trim="ruleForm.planpoint[index]" :precision="1" :step="0.5"
+                  style="--el-input-number-unit: '策划'">
+                </el-input-number>
               </div>
             </div>
             <el-radio-group v-model="ifcoefficient" style="width:100%;margin:20px 0">
@@ -88,7 +118,7 @@
               <div class="resultitem">月度绩效奖大约为：<span class="valuestyle">900</span></div>
               <div class="resultitem">目标奖约为：<span class="valuestyle">200 ~ 500</span></div>
               <el-divider></el-divider>
-              <div class="resultitem">本月奖金约为：<div class="valuestyle" style="font-size: 30px">{{salary+200}} ~
+              <div class="resultitem">本月奖金约为：<div class="valuestyle" style="font-size: 30px">{{emoji}} {{salary+200}} ~
                   {{salary+500}}</div>
               </div>
             </div>
@@ -191,12 +221,16 @@
           point: [0, 0, 0, 0, 0, 0, 0, 0],
           weekdaypoint: [0, 0, 0, 0, 0, 0, 0, 0],
           planpoint: [0, 0, 0, 0, 0, 0, 0, 0]
-        }
+        },
+        isPhone: false,
+        emoji: ''
       }
     },
     components: {},
     created () {
-
+      var info = navigator.userAgent;
+      var isPhone = /mobile/i.test(info);
+      this.isPhone = isPhone
     },
     watch: {
       coefficientstandard (newval, oldval) {
@@ -263,6 +297,7 @@
       pricereset () {
         this.ruleForm.point = [0, 0, 0, 0, 0, 0, 0, 0]
         this.ruleForm.weekdaypoint = [0, 0, 0, 0, 0, 0, 0, 0]
+        this.ruleForm.planpoint = [0, 0, 0, 0, 0, 0, 0, 0]
         this.ifcalculate = false
       },
       calculatesalary () {
@@ -314,6 +349,17 @@
         this.planpoint = planpoint
         this.totalpoint = keypoint + normalpoint + planpoint
         this.salary = this.totalpoint * 10 + 900
+        if (this.salary < 5000) {
+          this.emoji = '🤬'
+        } else if (this.salary > 5000 && this.salary < 7000) {
+          this.emoji = '😑'
+        } else if (this.salary > 7000 && this.salary < 9000) {
+          this.emoji = '🫡'
+        } else if (this.salary > 9000 && this.salary < 10000) {
+          this.emoji = '🤓'
+        } else if (this.salary > 10000) {
+          this.emoji = '🤪'
+        }
         this.ifcalculate = true
       },
     }
