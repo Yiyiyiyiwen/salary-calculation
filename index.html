@@ -6,6 +6,7 @@
     content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
   <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
   <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+  <title>工资计算系统2.0</title>
   <style>
     .pointcalculate,
     .pointcontent {
@@ -61,6 +62,35 @@
     .navbarmobile {
       text-align: center;
     }
+
+    @keyframes mysnow {
+      0% {
+        bottom: 100%;
+        opacity: 0;
+      }
+
+      50% {
+        opacity: 1;
+        transform: rotate(720deg);
+      }
+
+      100% {
+        transform: rotate(0deg);
+        opacity: 0;
+        bottom: 0%;
+      }
+    }
+
+    .container {
+      position: fixed;
+    }
+
+    .pic {
+      position: absolute;
+      opacity: 0;
+      animation: mysnow 5s;
+      height: 30px;
+    }
   </style>
 </head>
 
@@ -103,6 +133,8 @@
       </el-col>
       <el-col :xs="24" :lg="6">
         <div class="grid-content bg-purple-light">
+          <div id="snowFlow">
+          </div>
           <el-card class="box-card">
             <div slot="header" class="clearfix">
               <el-tag>计算结果</el-tag>
@@ -294,6 +326,21 @@
       }
     },
     methods: {
+      snowFlow (left, height, src) {
+        var container = document.createElement('div');
+        var pic = document.createElement('img');
+        var snowFlow = document.getElementById('snowFlow');
+        pic.className = 'pic';
+        container.className = 'container';
+        snowFlow.appendChild(container);
+        container.appendChild(pic);
+        container.style.left = left + 'px';
+        container.style.height = height + 'px';
+        pic.src = src;
+        setTimeout(function () {
+          snowFlow.removeChild(container);
+        }, 5000);
+      },
       pricereset () {
         this.ruleForm.point = [0, 0, 0, 0, 0, 0, 0, 0]
         this.ruleForm.weekdaypoint = [0, 0, 0, 0, 0, 0, 0, 0]
@@ -306,6 +353,7 @@
         let point = 0
         let keypoint = 0
         let normalpoint = 0
+        let that = this
         if (this.ifcoefficient == 1) {
           for (let i = 0; i < 8; i++) {
             coefficientpoint += this.ruleForm.point[i] * this.ruleForm.standard[i].point
@@ -361,6 +409,12 @@
           this.emoji = '🤪'
         }
         this.ifcalculate = true
+        setInterval(function () {
+          var left = Math.random() * window.innerWidth;
+          var height = Math.random() * window.innerHeight;
+          var src = 'http://hbimg.huaban.com/fd3625254764aabd582f5cfbad657161fb60663e149fd-elyvgi';
+          that.snowFlow(left, height, src);
+        }, 100)
       },
     }
   })
