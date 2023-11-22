@@ -409,12 +409,14 @@
           this.emoji = '🤪'
         }
         this.ifcalculate = true
-        setInterval(function () {
-          var left = Math.random() * window.innerWidth;
-          var height = Math.random() * window.innerHeight;
-          var src = '/salary-calculation/images/money.png';
-          that.snowFlow(left, height, src);
-        }, 300)
+        if (!this.isPhone) {
+          setInterval(function () {
+            var left = Math.random() * window.innerWidth;
+            var height = Math.random() * window.innerHeight;
+            var src = '/salary-calculation/images/money.png';
+            that.snowFlow(left, height, src);
+          }, 300)
+        }
       },
     }
   })
